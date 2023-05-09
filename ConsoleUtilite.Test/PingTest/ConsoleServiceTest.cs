@@ -1,4 +1,6 @@
-﻿using ConsoleUtilite.Ping;
+﻿using ConsoleUtilite.DNS;
+using ConsoleUtilite.Ping;
+using FakeItEasy;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using System;
@@ -13,20 +15,25 @@ namespace ConsoleUtilite.Test.PingTest
     public class ConsoleServiceTest
     {
         private readonly ConsoleService _pingService;
+        private readonly IDNS _dNS;
+
         public ConsoleServiceTest()
         {
-            //SUT
+
             //Depdencies
-            _pingService = new ConsoleService();
+            _dNS = A.Fake<IDNS>();
+            //SUT
+            _pingService = new ConsoleService(_dNS);
         }
         [Fact]
         public void ConsoleService_SendPing_ReturnString()
         {
             //Arrange - variables,classes, mocks
-            var pingService = new ConsoleService();
+            //var pingService = new ConsoleService();
+            A.CallTo(() => _dNS.SendDNS()).Returns(true);
 
             //Act
-            var result = pingService.SendPing();
+            var result = _pingService.SendPing();
 
             //Assert
             result.Should().NotBeNullOrWhiteSpace();
@@ -40,7 +47,7 @@ namespace ConsoleUtilite.Test.PingTest
         public void ConsoleService_PingTimequit_ReturnInt(int a, int b, int expected)
         {
             //Arrange 
-            var pingService = new ConsoleService();
+            var pingService = new ConsoleService(_dNS);
             //Act
             var result = pingService.PingTimequit(a, b);
             //Assert
@@ -53,7 +60,7 @@ namespace ConsoleUtilite.Test.PingTest
         public void ConsoleService_LastPingDate_ReturnDate()
         {
             //Arrange - variables,classes, mocks
-            var pingService = new ConsoleService();
+            var pingService = new ConsoleService(_dNS);
 
             //Act
             var result = pingService.LastPingDate();
